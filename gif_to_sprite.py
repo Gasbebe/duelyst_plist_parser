@@ -1,3 +1,4 @@
+import os
 from PIL import Image, ImageSequence
 import math
 
@@ -34,9 +35,27 @@ def gif_to_square_sprite(gif_path, sprite_path):
     # Save the sprite image
     sprite_image.save(sprite_path)
 
-
+def process_gif_folder(input_folder, output_folder):
+    # Ensure the output folder exists
+    if not os.path.exists(output_folder):
+        os.makedirs(output_folder)
+    
+    # Walk through the directory tree
+    for root, dirs, files in os.walk(input_folder):
+        for filename in files:
+            if filename.lower().endswith('.gif'):
+                gif_path = os.path.join(root, filename)
+                # Preserve the directory structure in the output folder
+                relative_path = os.path.relpath(root, input_folder)
+                output_dir = os.path.join(output_folder, relative_path)
+                if not os.path.exists(output_dir):
+                    os.makedirs(output_dir)
+                sprite_filename = os.path.splitext(filename)[0] + '.png'
+                sprite_path = os.path.join(output_dir, sprite_filename)
+                gif_to_square_sprite(gif_path, sprite_path)
+                print(f"Converted {gif_path} to {sprite_path}")
 
 # Example usage
-gif_path = '_output/resources/units/boss_andromeda_attack.gif'
-sprite_path = 'sprites/output_sprite.png'
-gif_to_square_sprite(gif_path, sprite_path)
+input_folder = 'path/to/your/input/folder'
+output_folder = 'path/to/your/output/folder'
+process_gif_folder(input_folder, output_folder)
